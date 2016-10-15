@@ -1,4 +1,5 @@
 package com.teamproject.activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -22,8 +23,7 @@ import java.util.List;
 public class DrawRoute extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     private RadioGroup rg;
-    final competitionDTO competition = CompList.comp;
-    String ID_zaw = competition.getID_zawodow();
+    String ID_zaw;
     List<String> trasa = new ArrayList<String>();
     List<String> pk_start = new ArrayList<String>();
     List<String> pk_pk = new ArrayList<String>();
@@ -38,6 +38,8 @@ public class DrawRoute extends FragmentActivity implements OnMapReadyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        Intent intentX = getIntent();
+        ID_zaw = intentX.getExtras().getString("ID");
         rg = (RadioGroup) findViewById(R.id.radio_group_list_selector);
         String url = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/gps/all?competition_id="+ID_zaw;
         sendHttpRequest(url, "GET");

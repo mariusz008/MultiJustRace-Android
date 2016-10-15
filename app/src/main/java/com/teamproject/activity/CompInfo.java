@@ -39,6 +39,10 @@ import com.teamproject.functions.RestController;
 import com.teamproject.functions.TimeValidation;
 import com.teamproject.models.competitionDTO;
 import com.teamproject.models.userDTO;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,28 +56,35 @@ public class CompInfo extends Activity {
 	private TextView datarozTV, nazwaTV, miejscowoscTV, typTV, godzrozpTV, datazakTV, godzzakTV, limitTV, oplataTV, opisTV, katTV, kat;
 	Intent intent4 = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 	TurningOnGPS gpssx;
-	String error, error1, ret, ret1, whichList1, kategoria, ktore_zawody= "";
-	final competitionDTO competition = CompList.comp;
-	String ID_zad = competition.getID_zawodow();
+	String error, error1, ret, ret1, whichList1, ID, idX, kategoria, ktore_zawody= "";
 	DialogCommunications comm = new DialogCommunications(context);
 	ImageView typIV;
 	Spinner mSpinner;
 	final userDTO user1 = Login.user;
 	String ID_usera = user1.getID_uzytkownika();
 	TimeValidation tv = new TimeValidation();
-	boolean flaga1, flaga2, mappc, mapoi, matrase, mozezapisac;
-	int inn;
+	boolean flaga1, flaga2, mappc, mapoi, matrase, mozezapisac, focus;
+	int inn, flow, row;
 	Spanned spanned;
-	Intent intent2, intent3, intent5, intentmapa, intentlista;
-	String success1, success;
+	Intent intent, intent1, intent2, intent3, intent5, intentmapa, intentlista;
+	String success1, success, wieloetap;
 	ArrayList<String> category = new ArrayList<String>();
 	ArrayList<String> description = new ArrayList<String>();
+	ArrayList<String> stringArray = new ArrayList<String>();
+	ArrayList<String> stringArray1 = new ArrayList<String>();
+	ArrayList<String> stringArray2 = new ArrayList<String>();
+	ArrayList<String> stringArray3 = new ArrayList<String>();
+	ArrayList<String> stringArray4 = new ArrayList<String>();
+	ArrayList<String> stringArray5 = new ArrayList<String>();
+	ArrayList<String> stringArray6 = new ArrayList<String>();
+	ArrayList<String> stringArray7 = new ArrayList<String>();
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.competition);	
 		Intent intentX = getIntent();
 		gpssx = new TurningOnGPS(getApplicationContext());
 		whichList1 = intentX.getExtras().getString("ktory");
+		ID = intentX.getExtras().getString("ID");
 		button2 = (Button) findViewById(R.id.Button2);	
 		button1 = (Button) findViewById(R.id.Button1);
 		datarozTV = (TextView) findViewById(R.id.TextView1);
@@ -94,33 +105,15 @@ public class CompInfo extends Activity {
 		intent5 = new Intent(CompInfo.this, StartComp.class);
 		intentlista = new Intent(CompInfo.this, CompetitorsList.class);
 		intentmapa = new Intent(CompInfo.this, DrawRoute.class);
-		String url="http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition?id="+ID_zad;
-		sendHttpRequest(url, "GET", 0, true);
-
-		if (whichList1.equals("OGOLNE")){
-			button1.setText("Zapisz się na zawody");
-			button1.setBackgroundResource(R.color.navyblue);
-			inn = 1;
-		}
-		if (whichList1.equals("OSOBISTE")){
-			button1.setText("Wypisz się z zawodów");
-			button1.setBackgroundResource(R.color.navyblue);
-			inn = 2;
-		}
-		if (whichList1.equals("ORG")){
-			button1.setText("Ustal trasę");
-			button1.setBackgroundResource(R.color.navyblue);
-			inn = 3;
-		}
-		if (whichList1.equals("OBSERW")){
-			button1.setText("Zobacz listę uczestników");
-			button1.setBackgroundResource(R.color.navyblue);
-			inn = 4;
-		}
+		intent = new Intent(this, CompInfo.class);
+		intent1 = new Intent(this, ResultsList.class);
+		//Toast.makeText(CompInfo.this, ID, Toast.LENGTH_LONG).show();
+		String url="http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition?id="+ID;
+		sendHttpRequest(url, "GET", 0, false);
 
 
 		new DownloadImageTask(typIV)
-        .execute("http://209785serwer.iiar.pwr.edu.pl/RestImage/rest/competition/get/image?competition_id="+ID_zad);
+        .execute("http://209785serwer.iiar.pwr.edu.pl/RestImage/rest/competition/get/image?competition_id="+ID);
 
 		button2.setOnClickListener(new OnClickListener() {
 			@Override
@@ -170,7 +163,7 @@ public class CompInfo extends Activity {
 								})
 							.setPositiveButton("Tak", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
-									String url3 = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event/leave?competition_id=" + ID_zad + "&user_id=" + ID_usera;
+									String url3 = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event/leave?competition_id=" + ID + "&user_id=" + ID_usera;
 									sendHttpRequest(url3, "DELETE", 0, true);
 								}
 							});
@@ -194,18 +187,25 @@ public class CompInfo extends Activity {
 									})
 									.setPositiveButton("Tak", new DialogInterface.OnClickListener() {
 										public void onClick(DialogInterface dialog, int id) {
+											intent3.putExtra("ID", ID);
 											startActivity(intent3);
 										}
 									});
 							AlertDialog alertDialog = alertDialogBuilder.create();
 							alertDialog.show();
 						}
-						else startActivity(intent3);
+						else {
+
+							intent3.putExtra("ID", ID);
+							startActivity(intent3);
+
+						}
 					} else {
 						comm.alertDialog("Pobieranie lokalizacji", "Proszę włączyć usługę GPS");
 					}
 				}
 				if (inn == 4){
+					intentlista.putExtra("ID", ID);
 					startActivity(intentlista);
 				}
 				
@@ -250,7 +250,7 @@ public class CompInfo extends Activity {
 		mButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				String url2 = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event?user_id=" + ID_usera + "&competition_id=" + ID_zad +
+				String url2 = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event?user_id=" + ID_usera + "&competition_id=" + ID +
 						"&category_name=" + kategoria;
 				sendHttpRequest(url2, "PUT", 2, true);
 				alertDialog.cancel();
@@ -308,13 +308,15 @@ public class CompInfo extends Activity {
 				} else if (x.equals("START")) {
 					if (gpssx.checkingGPSStatus()) {
 						String url = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event/user/start?competition_id="
-								+ID_zad+"&user_id="+ID_usera;
+								+ID+"&user_id="+ID_usera;
 						sendHttpRequest(url, "PUT", 2, true);
 					} else {
 						comm.alertDialog("Pobieranie lokalizacji", "Proszę włączyć usługę GPS");
 					}
-				} else
+				} else {
+					y.putExtra("ID", ID);
 					startActivity(y);
+				}
 			}
 
 		});
@@ -349,7 +351,7 @@ public class CompInfo extends Activity {
 						if (!tv.validate(time)) {
 							comm.alertDialog("Komunikat", "Wpisz poprawny format daty (hh:mm)");
 						} else {
-							String url4 = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event/start?competition_id=" + ID_zad +
+							String url4 = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event/start?competition_id=" + ID +
 									"&owner_id=" + ID_usera + "&time=" + time;
 							sendHttpRequest(url4, "PUT", 1, true);
 						}
@@ -366,14 +368,56 @@ public class CompInfo extends Activity {
 			public void onResponseReceived(String result) {
 				if (operation == "GET"&& i==0){
 					//pobierz dane zawodow
+
 					try {
 						parsingJSON(result);
 					} catch (JSONException e) {
 
 					}
-					String url1 ="http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/category/list?competition_id="+ID_zad;
+					String url1 ="http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/category/list?competition_id="+ID;
 					//pobierz kategorie
 					sendHttpRequest(url1, "GET", 1, false);
+					if (whichList1.equals("OGOLNE") && wieloetap.length()==1){
+						button1.setText("Zapisz się na zawody");
+						button1.setBackgroundResource(R.color.navyblue);
+						inn = 1;
+					}
+					else if (whichList1.equals("OGOLNE") && wieloetap.length()>1){
+						button1.setVisibility(View.INVISIBLE);
+					}
+					else if (whichList1.equals("OSOBISTE") && wieloetap.length()==1){
+						button1.setText("Wypisz się z zawodów");
+						button1.setBackgroundResource(R.color.navyblue);
+						inn = 2;
+					}
+					else if (whichList1.equals("OSOBISTE") && wieloetap.length()>1){
+						button1.setVisibility(View.INVISIBLE);
+					}
+					else if (whichList1.equals("ORG") && !wieloetap.equals("1")){
+						button1.setText("Ustal trasę");
+						button1.setBackgroundResource(R.color.navyblue);
+						inn = 3;
+					}
+					else if (whichList1.equals("ORG") && wieloetap.equals("1")){
+						button1.setVisibility(View.INVISIBLE);
+					}
+					else if (whichList1.equals("OBSERW")){
+						button1.setText("Zobacz listę uczestników");
+						button1.setBackgroundResource(R.color.navyblue);
+						inn = 4;
+					}
+
+					if(wieloetap.equals("1")){
+						String urlx = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/all?type=&name=&place=&wieloetapowe="+ID;
+						sendHttpRequest(urlx, "GET", 2, true);
+					}
+				}
+				else if (operation == "GET"&& i == 2){
+					try {
+						parsingJSON1(result);
+					} catch (JSONException e) {
+
+					}
 				}
 				else if (operation == "GET"&& i == 1){
 					//pobranie kategorii
@@ -460,7 +504,7 @@ public class CompInfo extends Activity {
 			}
 			else if (wejscie.contains("User set as ready")){
 				String url = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/checkpart?user_id="+ID_usera+
-						"&competition_id="+ID_zad;
+						"&competition_id="+ID;
 				sendHttpRequest(url, "GET", 2, false);
 				flaga1=true;
 			}
@@ -496,7 +540,8 @@ public class CompInfo extends Activity {
 			.setNeutralButton("OK",new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,int id) {
 				dialog.cancel();
-					if ((ret1==success1) && tt.contains("Ok!")){
+					if ((ret1==success1) && tt.contains("Ok!")) {
+						intent5.putExtra("ID", ID);
 						startActivity(intent5);
 					}
 				}});
@@ -560,20 +605,43 @@ public class CompInfo extends Activity {
 			alertDialog1.show();
 	}
 
+	public void parsingJSON1(String JSON) throws JSONException {
+		//Toast.makeText(CompList.this, JSON, Toast.LENGTH_LONG).show();
+		stringArray.clear();
+		stringArray1.clear();
+		stringArray2.clear();
+		stringArray3.clear();
+		stringArray4.clear();
+		stringArray5.clear();
+		stringArray6.clear();
+		stringArray7.clear();
+		int i;
+		JSONArray jsonarray = new JSONArray(JSON);
+		for (i = 0; i < jsonarray.length(); i++) {
+
+			JSONObject obj = jsonarray.getJSONObject(i);
+			stringArray.add(obj.getString("DATA_ROZP"));
+			stringArray1.add(obj.getString("NAME"));
+			stringArray2.add(obj.getString("MIEJSCOWOSC"));
+			stringArray3.add(obj.getString("COMPETITION_ID"));
+			stringArray4.add(obj.getString("TYP"));
+			if(obj.toString().contains("ILE_OSOB"))
+				stringArray5.add(obj.getString("ILE_OSOB"));
+			else stringArray5.add("");
+			if(obj.toString().contains("ROUTE_ID"))
+				stringArray6.add("1");
+			else stringArray6.add("0");
+			stringArray7.add(obj.getString("WIELOETAPOWE"));
+		}
+		populateButtons(i, stringArray, stringArray1, stringArray2, stringArray3, stringArray4, stringArray5, stringArray6, stringArray7);
+	}
+
 	public void parsingJSON(String JSON) throws JSONException
 	{
 		if(JSON.contains("ROUTE_ID")) mappc=true;
 		if(JSON.contains("ROUTEPOI_ID")) mapoi=true;
 		if(JSON.contains("TRACK_ID")) matrase=true;
-		if (whichList1.equals("OSOBISTE")){
-			if(matrase&&mappc)
-				addButton("START", intent5, R.color.navyblue);
-		}
-		if (mappc || matrase) addButton("Zobacz trasę", intentmapa, R.color.navyblue);
-		if (whichList1.equals("ORG")){
-			if(matrase && mappc)
-				addButton("Ustal godzinę startu", null, R.color.navyblue);
-		}
+
 		JSONObject obj = new JSONObject(JSON);		
 		String naz = obj.getString("NAME");
 		String miej = obj.getString("MIEJSCOWOSC");
@@ -585,8 +653,16 @@ public class CompInfo extends Activity {
 		String lim = obj.getString("LIMIT_UCZ");
 		String opl = obj.getString("OPLATA");
 		String opis = obj.getString("OPIS");
-
-
+		wieloetap = obj.getString("WIELOETAPOWE");
+		if (whichList1.equals("OSOBISTE")){
+			if(matrase&&mappc && !wieloetap.equals("1"))
+				addButton("START", intent5, R.color.navyblue);
+		}
+		if (mappc || matrase && !wieloetap.equals("1")) addButton("Zobacz trasę", intentmapa, R.color.navyblue);
+		if (whichList1.equals("ORG")){
+			if(matrase && mappc && !wieloetap.equals("1"))
+				addButton("Ustal godzinę startu", null, R.color.navyblue);
+		}
 		datarozTV.setText(datro);
 		nazwaTV.setText(naz);
 		miejscowoscTV.setText(miej);
@@ -639,6 +715,104 @@ public class CompInfo extends Activity {
 				katTV.append(category.get(i) + ": " + description.get(i) + "\n");
 			}
 			if(spanned.length()!=0) opisTV.setLines(25);
+		}
+	}
+	private void populateButtons(int i, ArrayList<String> data, ArrayList<String> nazwa, ArrayList<String> miasto,
+								 final ArrayList<String> id, ArrayList<String> typ, ArrayList<String> ileOsob,
+								 ArrayList<String> pcc, ArrayList<String> wieloetapowe) {
+		TableLayout table = (TableLayout) findViewById(R.id.tableButtons1);
+		table.removeAllViews();
+		for (row = 0; row < i; row++) {
+			TableRow tableRow = new TableRow(this);
+			tableRow.setLayoutParams(new TableLayout.LayoutParams(
+					TableLayout.LayoutParams.MATCH_PARENT,
+					TableLayout.LayoutParams.MATCH_PARENT
+			));
+			table.addView(tableRow);
+			Button button = new Button(this);
+			button.setLayoutParams(new TableRow.LayoutParams(
+					TableRow.LayoutParams.WRAP_CONTENT,
+					TableRow.LayoutParams.WRAP_CONTENT
+			));
+			final String id_zawodow = id.get(row);
+			button.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+
+			if (typ.get(row).contains("arciars")) {
+				button.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_narciarskie, 0, 0, 0);
+			} else if (typ.get(row).contains("Kolarstwo") || typ.get(row).contains("kolarstwo")) {
+				button.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_rowerowe, 0, 0, 0);
+			} else if
+					(typ.get(row).contains("Bieg") || typ.get(row).contains("Chód") || typ.get(row).contains("bieg")) {
+				button.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_biegi, 0, 0, 0);
+			} else if (typ.get(row).equals("Wyścig samolotów") || typ.get(row).equals("Wyścig balonów")) {
+				button.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_powietrzne, 0, 0, 0);
+			} else if (typ.get(row).contains("Wyścig") || typ.get(row).contains("Karting")) {
+				button.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_motorowe, 0, 0, 0);
+			} else if (typ.get(row).contains("Kajakarstwo") || typ.get(row).contains("Wioślarstwo")) {
+				button.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_lodzie, 0, 0, 0);
+			} else
+				button.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_inne, 0, 0, 0);
+			button.setTextColor(getApplication().getResources().getColor(R.color.navyblue));
+			button.setCompoundDrawablePadding(30);
+			if(wieloetapowe.get(row).equals("0"))
+				button.setBackground(getResources().getDrawable(R.drawable.rounded_border_comp1));
+			else if(wieloetapowe.get(row).equals("1"))
+				button.setBackground(getResources().getDrawable(R.drawable.rounded_border_comp2));
+			else button.setBackground(getResources().getDrawable(R.drawable.rounded_border_comp));
+			button.setText(data.get(row) + ",\n" + nazwa.get(row) + ",\n" + miasto.get(row));
+			DateTimeFormatter formatter = DateTimeFormat.forPattern("dd.MM.yyyy");
+			DateTime eventDate = formatter.parseDateTime(data.get(row));
+			eventDate = formatter.parseDateTime(data.get(row));
+			if (!focus) {
+				if (!eventDate.isBeforeNow()) {
+					focus = true;
+					flow = row + 4;
+				}
+
+			} else {
+				if (row == flow) {
+					button.setFocusable(true);
+					button.setFocusableInTouchMode(true);
+					button.requestFocus();
+				}
+			}
+			final int tmp = row;
+			if(whichList1.contains("RESULTS")) {
+				button.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						//comp1.setID_zawodow(id_zawodow);
+						//intent.putExtra("ktory", whichList);
+						//CompInfo.this.finish();
+						idX = id_zawodow;
+						intent1.putExtra("ID", idX);
+						startActivity(intent1);
+					}
+
+				});
+			}
+			else {
+				button.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						//Toast.makeText(CompInfo.this, id_zawodow, Toast.LENGTH_LONG).show();
+						//comp1.setID_zawodow(id_zawodow);
+						intent.putExtra("ktory", whichList1);
+						idX = id_zawodow;
+						intent.putExtra("ID", idX);
+						//CompInfo.this.finish();
+						startActivity(intent);
+					}
+
+				});
+			}
+			if(whichList1.contains("OGOLNERESULTS") || whichList1.contains("OBSERWRESULTS"))
+			{
+				if(!(ileOsob.get(row).equals("0"))&&(pcc.get(row).equals("1")))
+					tableRow.addView(button);
+			}
+			else //if (wieloetapowe.get(row).length()>1 && wieloetapowe.get(row).equals(ID))
+				tableRow.addView(button);
 		}
 	}
 

@@ -70,13 +70,14 @@ public class MakingRoute extends FragmentActivity implements OnMapReadyCallback,
     private GoogleApiClient client;
     final userDTO us = Login.user;
     final String ownerID = us.getID_uzytkownika();
-    final competitionDTO competition = CompList.comp;
-    String ID_zaw = competition.getID_zawodow();
+    String ID_zaw;
     DialogCommunications comm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tracker);
+        Intent intentX = getIntent();
+        ID_zaw = intentX.getExtras().getString("ID");
         gps = new TurningOnGPS(getApplicationContext());
         comm = new DialogCommunications(context);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

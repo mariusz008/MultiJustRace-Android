@@ -2,6 +2,7 @@ package com.teamproject.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -29,8 +30,7 @@ public class ResultsList extends Activity {
     private Button buttonWyjdz;
     private ImageButton refresh;
     final Context context = this;
-    final competitionDTO competition = CompList.comp;
-    String ID_zaw = competition.getID_zawodow();
+    String ID_zaw;
     ArrayList<String> imieAL = new ArrayList<String>();
     ArrayList<String> nazwiskoAL = new ArrayList<String>();
     ArrayList<String> numerAL = new ArrayList<String>();
@@ -43,6 +43,8 @@ public class ResultsList extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.results_list);
+        Intent intentX = getIntent();
+        ID_zaw = intentX.getExtras().getString("ID");
         buttonWyjdz = (Button) findViewById(R.id.buttonAlert);
         refresh = (ImageButton) findViewById(R.id.imageButton);
         url = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/result/list?" +

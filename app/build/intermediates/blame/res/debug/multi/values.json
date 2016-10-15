@@ -12065,7 +12065,15 @@
                     "endOffset": 892
                 },
                 "from": {
-                    "file": "C:\\Users\\008M\\Desktop\\MJR\\app\\src\\main\\res\\values\\strings.xml"
+                    "file": "C:\\Users\\008M\\Desktop\\MJR\\app\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 54,
+                        "startColumn": 4,
+                        "startOffset": 2592,
+                        "endLine": 76,
+                        "endColumn": 19,
+                        "endOffset": 3407
+                    }
                 }
             },
             {
@@ -14790,14 +14798,7 @@
                     "endOffset": 35982
                 },
                 "from": {
-                    "file": "C:\\Users\\008M\\Desktop\\MJR\\app\\src\\main\\res\\values\\strings.xml",
-                    "position": {
-                        "startLine": 3,
-                        "startColumn": 4,
-                        "startOffset": 59,
-                        "endColumn": 40,
-                        "endOffset": 95
-                    }
+                    "file": "C:\\Users\\008M\\Desktop\\MJR\\app\\src\\main\\res\\values\\strings.xml"
                 }
             },
             {

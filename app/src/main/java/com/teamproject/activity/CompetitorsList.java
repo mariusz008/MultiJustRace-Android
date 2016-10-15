@@ -2,6 +2,7 @@ package com.teamproject.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -32,8 +33,7 @@ public class CompetitorsList extends Activity {
     private Button buttonWyjdz, buttonFiltruj;
     private EditText plecET, wiekET, kategoriaET, frazaET;
     final Context context = this;
-    final competitionDTO competition = CompList.comp;
-    String ID_zaw = competition.getID_zawodow();
+    String ID;
     ArrayList<String> imieAL = new ArrayList<String>();
     ArrayList<String> nazwiskoAL = new ArrayList<String>();
     ArrayList<String> numerAL = new ArrayList<String>();
@@ -46,6 +46,10 @@ public class CompetitorsList extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.competitors_list);
+
+        Intent intentX = getIntent();
+        ID = intentX.getExtras().getString("ID");
+       // Toast.makeText(CompetitorsList.this, ID, Toast.LENGTH_LONG).show();
         buttonWyjdz = (Button) findViewById(R.id.buttonAlert);
         buttonFiltruj = (Button) findViewById(R.id.button1);
         plecET = (EditText) findViewById(R.id.editText1);
@@ -53,7 +57,7 @@ public class CompetitorsList extends Activity {
         kategoriaET = (EditText) findViewById(R.id.editText3);
         frazaET = (EditText) findViewById(R.id.editText4);
         String url = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event/list?" +
-                "competition_id="+ID_zaw+"&sex=&age=&phrase=&category=";
+                "competition_id="+ID+"&sex=&age=&phrase=&category=";
         sendHttpRequest(url, "GET");
         buttonWyjdz.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +73,7 @@ public class CompetitorsList extends Activity {
                 String kat = kategoriaET.getText().toString();
                 String fraza = frazaET.getText().toString();
                 String url = "http://209785serwer.iiar.pwr.edu.pl/Rest1/rest/competition/event/list?" +
-                        "competition_id="+ID_zaw+"&sex="+plec+"&age="+wiek+"&phrase="+fraza+"&category="+kat;
+                        "competition_id="+ID+"&sex="+plec+"&age="+wiek+"&phrase="+fraza+"&category="+kat;
                 sendHttpRequest(url, "GET");
             }
         });

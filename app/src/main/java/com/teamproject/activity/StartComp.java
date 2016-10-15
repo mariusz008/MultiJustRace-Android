@@ -101,8 +101,7 @@ public class StartComp extends FragmentActivity implements OnMapReadyCallback {
     private long startTime1, startTime2, timeBetween, timeBetween2, tmptime, timeInMilliseconds, timeSwapBuff, updatedTime = 0L;
     Date czasGPS1;
     private Handler customHandler = new Handler();
-    final competitionDTO competition = CompList.comp;
-    String ID_zaw = competition.getID_zawodow();
+    String ID_zaw;
     final userDTO user1 = Login.user;
     String ID_usera = user1.getID_uzytkownika();
     int h=0, radius=4;
@@ -112,6 +111,8 @@ public class StartComp extends FragmentActivity implements OnMapReadyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.startcomp);
+        Intent intentX = getIntent();
+        ID_zaw = intentX.getExtras().getString("ID");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
